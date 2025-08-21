@@ -46,7 +46,7 @@
 
                 <div class="flex items-center justify-center">
                     <div class="max-w-md w-full px-8">
-                        <h2 class="text-2xl font-bold text-orange-500 mb-4">Verifikasi Akun</h2>
+                        <h2 class="text-2xl font-bold text-orange-500 mb-4 text-center">Verifikasi Akun</h2>
                         <p class="text-gray-600 mb-4">
                             Silahkan verifikasi akun anda terlebih dahulu untuk bisa melakukan penggantian kata sandi
                         </p>
@@ -74,8 +74,35 @@
                         </div>
 
                         <p class="text-center text-gray-500">Belum menerima kode verifikasi melalui email?</p>
-                        <p class="text-center mt-1">Kirim Ulang Kode Verifikasi <span
-                                class="text-orange-500 font-semibold">(00:45)</span></p><br>
+                        <p class="text-center mt-1">Kirim Ulang Kode Verifikasi 
+                              <span id="countdown" class="text-orange-500 font-semibold">(00:45)</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 45;
+        const countdownEl = document.getElementById("countdown");
+
+        function startCountdown() {
+            const timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    countdownEl.textContent = "(00:00)";
+                    countdownEl.classList.remove("text-orange-500");
+                    countdownEl.classList.add("text-blue-600", "cursor-pointer");
+                    countdownEl.textContent = " Kirim Ulang";
+                } else {
+                    let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    let seconds = String(timeLeft % 60).padStart(2, '0');
+                    countdownEl.textContent = `(${minutes}:${seconds})`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        startCountdown();
+    </script><br>
                         <div class="flex justify-center">
                             <button type="submit"
                                 class=" bg-orange-500 text-white px-40 py-3 rounded-lg font-small text-sm hover:bg-orange-600 transition">
