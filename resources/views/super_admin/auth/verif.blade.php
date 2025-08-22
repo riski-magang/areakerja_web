@@ -56,7 +56,7 @@
         <!-- Kanan -->
         <div class="flex w-full md:w-4/2 bg-white items-center justify-center">
             <div class="w-full max-w-md p-8">
-                <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Verifikasi Akun</h2>
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Verifikasi Akun</h2>
 
                 <!-- Login Sosial -->
                 <div class="flex justify-center space-x-2 mb-3">
@@ -70,8 +70,8 @@
                 <form class="space-y-4">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700">E-mail</label>
-                        <input type="email" id="email" name="email" placeholder="Email"
-                            class="mt-2 block w-full border border-gray-700 rounded-lg p-2.5 focus:ring-orange-500 focus:border-orange-500" />
+                        <input type="e-mail" id="e-mail" name="email" placeholder="E-mail"
+                            class="mt-3 block w-full border border-gray-700 rounded-lg p-2.5 focus:ring-orange-500 focus:border-orange-500" />
                     </div>
                     <div class="flex justify-center">
                         <button type="submit"
@@ -79,7 +79,7 @@
                             Lanjutkan
                         </button>
                     </div>
-                    <a href="#" class="flex justify-center text-sm text-orange-500">Kembali</a>
+                    <a href="#" class="flex justify-center text-sm font-medium text-orange-500">Kembali</a>
                 </form>
             </div>
         </div>
