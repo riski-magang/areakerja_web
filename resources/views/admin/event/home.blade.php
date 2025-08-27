@@ -64,7 +64,7 @@
                             <td class="px-6 py-3 text-gray-700">27 Jul 2023 11.00</td>
                             <td class="px-6 py-3 flex space-x-1">
                             <td class="px-6 py-4 flex gap-2">
-                                 <button class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
+                                <button class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
                                     <svg width="19" height="20" viewBox="0 0 19 20" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path
