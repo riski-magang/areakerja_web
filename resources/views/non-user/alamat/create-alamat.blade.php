@@ -1,7 +1,5 @@
 @extends('layouts.index')
 @section('content')
- 
-
     <div class=" flex justify-center py-8">
         <div class="w-full max-w-4xl bg-white  p-6">
 
@@ -44,39 +42,40 @@
             <div class="mt-8">
                 <h3 class="text-base font-semibold hover:gray-100 border-b border-orange-500 pb-2 mb-4">Alamat</h3>
 
-                <form class="space-y-4">
+                <form action="{{ route('alamat.store') }}" method="POST" class="space-y-4">
+                    @csrf
                     <div>
                         <label class="block text-sm mb-1">Label Alamat</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="label" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Label Alamat">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Alamat Lengkap</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="desa" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Alamat Lengkap">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Kecamatan</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="kecamatan" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Kecamatan">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Kota</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Kota">
+                        <input type="text" name="kota" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Kota">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Provinsi</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="provinsi" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Provinsi">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Detail Alamat</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="detail" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Detail lainnya (Cth: Blok/Unit)">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Kode Pos</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2"
+                        <input type="text" name="kode_pos" class="w-full border border-gray-300 rounded-md px-3 py-2"
                             placeholder="Kode Pos">
                     </div>
 
