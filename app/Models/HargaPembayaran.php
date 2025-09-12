@@ -10,4 +10,9 @@ class HargaPembayaran extends Model
     use HasFactory;
     protected $table = 'harga_pembayarans';
     protected $guarded = [];
+
+    public function catatanCash()
+    {
+        return $this->hasMany(CatatanCash::class);
+    }
 }
