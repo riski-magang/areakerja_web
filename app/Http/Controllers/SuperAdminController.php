@@ -10,9 +10,12 @@ use App\Models\Divisi;
 use App\Models\Finance;
 use App\Models\Hargakoin;
 use App\Models\HargaPembayaran;
+use App\Models\Kecamatan;
+use App\Models\Kota;
 use App\Models\LowonganPerusahaan;
 use App\Models\Pelamar;
 use App\Models\Perusahaan;
+use App\Models\Provinsi;
 use App\Models\SuperAdmin;
 use App\Models\User;
 use Carbon\Carbon;
@@ -112,7 +115,7 @@ class SuperAdminController extends Controller
             "kecamatan"     => 'nullable|string',
             "desa"          => 'nullable|string',
             "kode_pos"      => 'nullable',
-            "detail_alamat" => 'nullable|string'    
+            "detail_alamat" => 'nullable|string'
         ]);
 
         $user = User::where('id', Auth::user()->id);
@@ -153,12 +156,21 @@ class SuperAdminController extends Controller
 
 
     //AKUN FREEZE
-    public function freezeForm()
+    public function freezeForm(Request $request)
     {
+        $search = $request->input('search');
+
+        $data = User::when($search, function ($query, $search) {
+            $query->where('username', 'like', "%{$search}%")
+                ->orWhere('role', 'like', "%{$search}%");
+        })->get();
+
         return view('super_admin.freeze.freeze', [
-            "data" => User::all()
+            'data' => $data,
+            'search' => $search
         ]);
     }
+
 
     public function ban(Request $request, User $user)
     {
@@ -193,12 +205,41 @@ class SuperAdminController extends Controller
     }
 
 
-    public function pelamarhal()
+    public function pelamarhal(Request $request)
     {
-        $kandidat = Pelamar::where('kategori', 'kandidat aktif')->get();
-        $nonKandidat = Pelamar::where('kategori', 'pelamar')->get();
-        $calonKandidat = Pelamar::where('kategori', 'calon kandidat')->get();
-                    
+        $search = $request->input('search');
+
+        $kandidatQuery = Pelamar::where('kategori', 'kandidat aktif');
+        $nonKandidatQuery = Pelamar::where('kategori', 'pelamar');
+        $calonKandidatQuery = Pelamar::where('kategori', 'calon kandidat');
+
+        if ($search) {
+            $kandidatQuery->where(function ($q) use ($search) {
+                $q->where('nama_pelamar', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('username', 'like', "%{$search}%");
+                    });
+            });
+
+            $nonKandidatQuery->where(function ($q) use ($search) {
+                $q->where('nama_pelamar', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('username', 'like', "%{$search}%");
+                    });
+            });
+
+            $calonKandidatQuery->where(function ($q) use ($search) {
+                $q->where('nama_pelamar', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('username', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $kandidat = $kandidatQuery->get();
+        $nonKandidat = $nonKandidatQuery->get();
+        $calonKandidat = $calonKandidatQuery->get();
+
         session()->forget(['pelamar_terakhir_id', 'kategori_terakhir']);
 
         return view('super_admin.pelamar.data-pelamar', [
@@ -375,7 +416,7 @@ class SuperAdminController extends Controller
 
     public function editUser($kategori, $id)
     {
-              
+
         $pelamar = Pelamar::with([
             'user',
             'alamat_pelamar',
@@ -650,9 +691,23 @@ class SuperAdminController extends Controller
         ]);
     }
 
-    public function createForm()
+    public function createForm(SuperAdmin $superadmin)
     {
-        return view('super_admin.add.create');
+        $provinsis = Provinsi::all();
+        // $superadmin->load(['kota', 'kecamatan', 'provinsi']);
+        return view('super_admin.add.create', [
+            'provinsis' => $provinsis
+        ]);
+    }
+
+    public function getKota($provinsi_id)
+    {
+        return response()->json(Kota::where('provinsi_id', $provinsi_id)->get());
+    }
+
+    public function getKecamatan($kota_id)
+    {
+        return response()->json(Kecamatan::where('kota_id', $kota_id)->get());
     }
 
     public function store(Request $request)
@@ -668,6 +723,12 @@ class SuperAdminController extends Controller
 
         if (in_array($request->role, ['admin', 'finance'])) {
             $rules['nama_lengkap'] = 'required';
+            $rules['provinsi_id']   = 'nullable|exists:provinsis,id';
+            $rules['kota_id']       = 'nullable|exists:kotas,id';
+            $rules['kecamatan_id']  = 'nullable|exists:kecamatans,id';
+            $rules['desa']          = 'nullable|string';
+            $rules['kode_pos']      = 'nullable|string';
+            $rules['detail_alamat'] = 'nullable|string';
         }
 
         $request->validate($rules);
@@ -707,9 +768,9 @@ class SuperAdminController extends Controller
                 Admin::create([
                     'user_id'       => $user->id,
                     'nama_lengkap'  => $request->nama_lengkap,
-                    'provinsi'      => $request->provinsi,
-                    'kota'          => $request->kota,
-                    'kecamatan'     => $request->kecamatan,
+                    'provinsi_id'      => $request->provinsi_id,
+                    'kota_id'          => $request->kota_id,
+                    'kecamatan_id'     => $request->kecamatan_id,
                     'kode_pos'      => $request->kode_pos,
                     'detail_alamat' => $request->detail_alamat,
                     'img_profile'   => $imgPath,
@@ -720,9 +781,9 @@ class SuperAdminController extends Controller
                 Finance::create([
                     'user_id'       => $user->id,
                     'nama_lengkap'  => $request->nama_lengkap,
-                    'provinsi'      => $request->provinsi,
-                    'kota'          => $request->kota,
-                    'kecamatan'     => $request->kecamatan,
+                    'provinsi_id'      => $request->provinsi_id,
+                    'kota_id'          => $request->kota_id,
+                    'kecamatan_id'     => $request->kecamatan_id,
                     'kode_pos'      => $request->kode_pos,
                     'detail_alamat' => $request->detail_alamat,
                     'img_profile'   => $imgPath,
@@ -764,16 +825,25 @@ class SuperAdminController extends Controller
 
     public function edit($id)
     {
-        $user = User::with(['admin', 'finance'])->findOrFail($id);
+        $user = User::with([
+            'admin.provinsi',
+            'admin.kota',
+            'admin.kecamatan',
+            'finance.provinsi',
+            'finance.kota',
+            'finance.kecamatan'
+        ])->findOrFail($id);
+        $provinsis = Provinsi::all();
         return view('super_admin.add.edit-addprofile', [
-            "user" => $user
+            "user" => $user,
+            'provinsis' => $provinsis
         ]);
     }
 
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $user = User::findOrFail($id);
-
         $rules = [
             'email'        => 'required|email|unique:users,email,' . $user->id,
             'username'     => 'required|unique:users,username,' . $user->id,
@@ -783,6 +853,12 @@ class SuperAdminController extends Controller
 
         if (in_array($request->role, ['admin', 'finance'])) {
             $rules['nama_lengkap'] = 'required';
+            $rules['provinsi_id']   = 'nullable|exists:provinsis,id';
+            $rules['kota_id']       = 'nullable|exists:kotas,id';
+            $rules['kecamatan_id']  = 'nullable|exists:kecamatans,id';
+            $rules['desa']          = 'nullable|string';
+            $rules['kode_pos']      = 'nullable|string';
+            $rules['detail_alamat'] = 'nullable|string';
         }
 
         $request->validate($rules);
@@ -823,12 +899,12 @@ class SuperAdminController extends Controller
         switch ($request->role) {
             case 'admin':
                 $user->admin()->updateOrCreate(
-                    ['user_id' => $user->id],
+                    [],
                     [
                         'nama_lengkap'  => $request->nama_lengkap,
-                        'provinsi'      => $request->provinsi,
-                        'kota'          => $request->kota,
-                        'kecamatan'     => $request->kecamatan,
+                        'provinsi_id'   => $request->provinsi_id,
+                        'kota_id'       => $request->kota_id,
+                        'kecamatan_id'  => $request->kecamatan_id,
                         'kode_pos'      => $request->kode_pos,
                         'detail_alamat' => $request->detail_alamat,
                         'img_profile'   => $imgPath,
@@ -838,14 +914,14 @@ class SuperAdminController extends Controller
 
             case 'finance':
                 $user->finance()->updateOrCreate(
-                    ['user_id' => $user->id],
+                    [],
                     [
                         'nama_lengkap'  => $request->nama_lengkap,
-                        'provinsi'      => $request->provinsi,
-                        'kota'          => $request->kota,
-                        'kecamatan'     => $request->kecamatan,
+                        'provinsi_id'   => $request->provinsi_id,
+                        'kota_id'       => $request->kota_id,
+                        'kecamatan_id'  => $request->kecamatan_id,
                         'kode_pos'      => $request->kode_pos,
-                        'desa'           => $request->desa,
+                        'desa'          => $request->desa,
                         'detail_alamat' => $request->detail_alamat,
                         'img_profile'   => $imgPath,
                     ]
@@ -957,9 +1033,17 @@ class SuperAdminController extends Controller
     }
 
 
-    public function halPerusahaan()
+    public function halPerusahaan(Request $request)
     {
-        $perusahaan = Perusahaan::all();
+        $search = $request->input('search');
+        $perusahaan = Perusahaan::with('user')
+            ->when($search, function ($query, $search) {
+                $query->where('nama_perusahaan', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('username', 'like', "%{$search}%");
+                    });
+            })
+            ->get();
         return view('super_admin.perusahaan.data-perusahaan', [
             'perusahaan' => $perusahaan
         ]);
