@@ -60,7 +60,7 @@
                     class="{{ request()->is('admin/perusahaan') ? 'bg-gray-500 text-white border-gray-500' : 'bg-white text-gray-500 border-gray-500 hover:bg-gray-500 hover:text-white' }} px-6 py-2 text-md font-medium border-2 rounded-lg transition duration-300">
                     Perusahaan
                 </a>
-                <a href="{{ url('/admin/recruitment') }}"
+                <a href="{{ route('admin.recruitment.perusahaan') }}"
                     class="{{ request()->is('admin/recruitment') ? 'bg-gray-500 text-white border-gray-500' : 'bg-white text-gray-500 border-gray-500 hover:bg-gray-500 hover:text-white' }} px-6 py-2 text-md font-medium border-2 rounded-lg transition duration-300">
                     Recruitment
                 </a>
