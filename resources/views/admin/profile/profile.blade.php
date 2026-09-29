@@ -3,17 +3,19 @@
     <main class="flex-1 p-4 sm:p-6 sm:ml-64 bg-slate-50/70 min-h-screen" x-data="{ openNotif: false, openAllNotif: false }">
 
         {{-- Header Top Bar --}}
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-            <div>
-                <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight">Profil Admin</h1>
-                <p class="text-xs text-slate-400 font-medium mt-0.5">Informasi akun dan data alamat administrator Anda</p>
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+            <div class="w-full sm:w-auto flex items-center justify-between">
+                <div>
+                    <h1 class="text-base sm:text-xl font-semibold text-slate-800 tracking-tight flex items-center gap-2">
+                        <i class="ph ph-user text-[#00509d] text-lg sm:text-2xl"></i> Profil Admin
+                    </h1>
+                    <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Informasi akun dan data administrator Anda</p>
+                </div>
+                <div class="sm:hidden flex items-center gap-2">
+                    @include('admin.components.notif_button')
+                </div>
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <a href="{{ route('admin.edit.profile') }}"
-                   class="inline-flex items-center gap-1.5 border border-slate-200 text-slate-700 hover:bg-[#00509d] hover:text-white hover:border-[#00509d] text-xs font-semibold px-4 py-2 rounded-xl transition shadow-xs">
-                    <i class="ph ph-pencil-simple text-sm"></i>
-                    Edit Profil
-                </a>
+            <div class="hidden sm:flex items-center gap-3 w-full sm:w-auto justify-end">
                 @include('admin.components.notif_button')
                 @include('admin.components.user_badge_dropdown')
             </div>
@@ -146,6 +148,14 @@
                     </div>
                 </div>
 
+            </div>
+
+            {{-- Edit Profil Button --}}
+            <div class="flex justify-end pt-6 border-t border-slate-100 mt-6">
+                <a href="{{ route('admin.edit.profile') }}"
+                   class="inline-flex items-center gap-2 bg-[#00509d] hover:bg-[#003d7a] text-white font-semibold text-xs px-6 py-2.5 rounded-xl shadow-xs transition">
+                    <i class="ph ph-pencil-simple text-sm"></i> Edit Profil
+                </a>
             </div>
 
         </div>
