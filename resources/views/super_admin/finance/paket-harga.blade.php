@@ -48,6 +48,11 @@
                     class="px-5 py-2 text-sm rounded-lg transition-all duration-200">
                     Laporan Keuangan
                 </button>
+                <button type="button" @click="currentTab = 'pengaturan_pembayaran'"
+                    :class="currentTab === 'pengaturan_pembayaran' ? 'bg-[#00509d] text-white shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900 font-medium'"
+                    class="px-5 py-2 text-sm rounded-lg transition-all duration-200">
+                    Pengaturan Pembayaran
+                </button>
             </div>
         </div>
 
@@ -453,6 +458,178 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        {{-- ================= TAB 4: PENGATURAN PEMBAYARAN ================= --}}
+        <div x-show="currentTab === 'pengaturan_pembayaran'" x-cloak
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0 translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="space-y-6">
+
+            <form action="{{ route('superadmin.paket-harga.update-payment-settings') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+                @method('PUT')
+
+                {{-- Status Gateway & Saluran Pembayaran (Mutually Exclusive) --}}
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6"
+                     x-data="{ activeMode: '{{ $paymentXenditEnabled ? 'xendit' : 'manual' }}' }">
+                    <div class="pb-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <h2 class="text-base font-bold text-gray-800">Status Saluran Pembayaran</h2>
+                            <p class="text-xs text-gray-500">Pilih salah satu metode pembayaran aktif untuk seluruh transaksi sistem (Hanya satu yang aktif)</p>
+                        </div>
+                        <span class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[11px] font-bold border border-amber-200 flex items-center gap-1.5">
+                            <i class="ph ph-lock-key"></i> Mode Tunggal (Eksklusif)
+                        </span>
+                    </div>
+
+                    {{-- Hidden input yang dikirim ke server --}}
+                    <input type="hidden" name="active_payment_mode" :value="activeMode">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Opsi 1: Xendit Gateway --}}
+                        <div @click="activeMode = 'xendit'"
+                             :class="activeMode === 'xendit' ? 'border-[#00509d] bg-blue-50/40 ring-2 ring-[#00509d]/20 shadow-xs' : 'border-gray-200 bg-gray-50/50 hover:border-gray-300 opacity-75'"
+                             class="p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none">
+                            <div>
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full transition"
+                                              :class="activeMode === 'xendit' ? 'bg-emerald-500 ring-4 ring-emerald-100' : 'bg-gray-300'"></span>
+                                        <span class="font-bold text-sm text-gray-800">Payment Gateway Otomatis (Xendit)</span>
+                                    </div>
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition"
+                                         :class="activeMode === 'xendit' ? 'border-[#00509d] bg-[#00509d]' : 'border-gray-300 bg-white'">
+                                        <div class="w-2 h-2 rounded-full bg-white" x-show="activeMode === 'xendit'"></div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                                    QRIS Dinamis nasional, Virtual Account per transaksi otomatis, dan E-Wallet realtime via Xendit API.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                                <span class="font-bold" :class="activeMode === 'xendit' ? 'text-emerald-600' : 'text-gray-400'">
+                                    <span x-show="activeMode === 'xendit'">● Sedang Dipilih (Aktif)</span>
+                                    <span x-show="activeMode !== 'xendit'">○ Nonaktif</span>
+                                </span>
+                                <span class="text-[11px] font-bold text-[#00509d]" x-show="activeMode === 'xendit'">Mode Gateway</span>
+                            </div>
+                        </div>
+
+                        {{-- Opsi 2: Transfer Manual & QRIS Statis --}}
+                        <div @click="activeMode = 'manual'"
+                             :class="activeMode === 'manual' ? 'border-[#00509d] bg-blue-50/40 ring-2 ring-[#00509d]/20 shadow-xs' : 'border-gray-200 bg-gray-50/50 hover:border-gray-300 opacity-75'"
+                             class="p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none">
+                            <div>
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full transition"
+                                              :class="activeMode === 'manual' ? 'bg-emerald-500 ring-4 ring-emerald-100' : 'bg-gray-300'"></span>
+                                        <span class="font-bold text-sm text-gray-800">Transfer Manual & QRIS Statis</span>
+                                    </div>
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition"
+                                         :class="activeMode === 'manual' ? 'border-[#00509d] bg-[#00509d]' : 'border-gray-300 bg-white'">
+                                        <div class="w-2 h-2 rounded-full bg-white" x-show="activeMode === 'manual'"></div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                                    Pengguna mentransfer ke rekening resmi pemilik AreaKerja atau scan QRIS statis, lalu mengunggah bukti struk.
+                                </p>
+                            </div>
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                                <span class="font-bold" :class="activeMode === 'manual' ? 'text-emerald-600' : 'text-gray-400'">
+                                    <span x-show="activeMode === 'manual'">● Sedang Dipilih (Aktif)</span>
+                                    <span x-show="activeMode !== 'manual'">○ Nonaktif</span>
+                                </span>
+                                <span class="text-[11px] font-bold text-amber-600" x-show="activeMode === 'manual'">Rekomendasi (Akun Gateway Off)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5">
+                        <i class="ph ph-info text-blue-600 text-base shrink-0 mt-0.5"></i>
+                        <span>
+                            <strong>Perhatian:</strong> Sistem hanya mengizinkan <strong>satu</strong> metode pembayaran aktif pada satu waktu. Saat memilih <em>Transfer Manual & QRIS Statis</em>, pemanggilan invoice ke Xendit otomatis dimatikan sehingga tidak akan terjadi error transaksi.
+                        </span>
+                    </div>
+                </div>
+
+                {{-- QRIS Statis Pemilik --}}
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                    <div class="pb-3 border-b border-gray-100">
+                        <h2 class="text-base font-bold text-gray-800">QRIS Statis Manual Pemilik</h2>
+                        <p class="text-xs text-gray-500">Unggah gambar QRIS statis pemilik untuk pembayaran manual saat gateway otomatis nonaktif</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-center gap-5">
+                        @if($paymentManualQrImage)
+                            <div class="w-32 h-32 rounded-2xl border border-gray-200 overflow-hidden bg-white p-2 shrink-0 shadow-xs">
+                                <img src="{{ $paymentManualQrImage }}" alt="QRIS Statis Pemilik" class="w-full h-full object-contain">
+                            </div>
+                        @endif
+                        <div class="flex-1 w-full">
+                            <input type="file" name="payment_manual_qr_image" accept="image/*"
+                                   class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00509d] file:text-white hover:file:bg-[#003d7a] file:cursor-pointer border border-gray-200 rounded-xl p-1 bg-gray-50/50">
+                            <p class="text-[11px] text-gray-400 mt-1">Format: JPG, PNG, atau SVG (Maks. 2MB)</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Rekening Bank Manual --}}
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                    <div class="pb-3 border-b border-gray-100">
+                        <h2 class="text-base font-bold text-gray-800">Daftar Rekening Bank Transfer Manual</h2>
+                        <p class="text-xs text-gray-500">Konfigurasi nomor rekening resmi yang ditampilkan ke pengguna</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach($paymentManualBanks as $idx => $bank)
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-gray-50/70 rounded-xl border border-gray-200">
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-600 block mb-1">Nama Bank</label>
+                                    <input type="text" name="bank_names[]" value="{{ $bank['bank_name'] ?? '' }}"
+                                           placeholder="Contoh: BCA / Mandiri"
+                                           class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 font-semibold">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-600 block mb-1">Nomor Rekening</label>
+                                    <input type="text" name="account_numbers[]" value="{{ $bank['account_number'] ?? '' }}"
+                                           placeholder="Contoh: 8040192837"
+                                           class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 font-mono">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-600 block mb-1">Atas Nama (a/n)</label>
+                                    <input type="text" name="account_holders[]" value="{{ $bank['account_holder'] ?? '' }}"
+                                           placeholder="Contoh: PT AREA KERJA INDONESIA"
+                                           class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Panduan Instruksi Transfer --}}
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                    <div class="pb-3 border-b border-gray-100">
+                        <h2 class="text-base font-bold text-gray-800">Panduan Instruksi Transfer & Konfirmasi</h2>
+                        <p class="text-xs text-gray-500">Petunjuk pembayaran yang ditampilkan pada tab transfer manual checkout</p>
+                    </div>
+
+                    <div>
+                        <textarea name="payment_manual_instructions" rows="4"
+                                  class="w-full p-3 text-xs border border-gray-300 rounded-xl focus:ring-1 focus:ring-blue-500 leading-relaxed font-sans">{{ $paymentManualInstructions }}</textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-[#00509d] hover:bg-[#003d7a] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-2">
+                        <i class="ph ph-floppy-disk text-base"></i>
+                        <span>Simpan Pengaturan Pembayaran</span>
+                    </button>
+                </div>
+            </form>
         </div>
 
         @include('super_admin.notif.modal_notif')
